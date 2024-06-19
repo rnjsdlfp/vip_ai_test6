@@ -45,3 +45,4 @@ if prompt := st.chat_input():
         st.chat_message("assistant").write(msg)
     except Exception as e:
         st.error(f"Error: {e}")
+
