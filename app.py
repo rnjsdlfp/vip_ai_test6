@@ -5,7 +5,7 @@ import openai
 with st.sidebar:
     openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
     assistant_id = st.text_input("Assistant ID", key="assistant_id")
-    "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
+    st.markdown("[Get an OpenAI API key](https://platform.openai.com/account/api-keys)")
 
 st.title("💬 VIP AI")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI & Jireh")
@@ -16,33 +16,33 @@ if "messages" not in st.session_state:
 
 # 기존 메시지 출력
 for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+    if msg["role"] == "user":
+        st.chat_message("user", msg["content"])
+    else:
+        st.chat_message("assistant", msg["content"])
 
 # 사용자 입력 처리
-if prompt := st.chat_input():
+prompt = st.text_input("User Input", key="user_input")
+if prompt:
     if not openai_api_key:
         st.info("Please add your OpenAI API key to continue.")
         st.stop()
-
     if not assistant_id:
         st.info("Please add the Assistant ID to continue.")
         st.stop()
 
     openai.api_key = openai_api_key
-
     st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
+    st.chat_message("user", prompt)
 
     try:
         # 최신 API 호출을 위한 코드
         response = openai.ChatCompletion.create(
             model="gpt-4o",  # 사용 가능한 모델로 변경
-            messages=st.session_state["messages"],
-            user=assistant_id  # Assistant ID 사용
+            messages=st.session_state["messages"]
         )
         msg = response.choices[0].message['content']
         st.session_state.messages.append({"role": "assistant", "content": msg})
-        st.chat_message("assistant").write(msg)
+        st.chat_message("assistant", msg)
     except Exception as e:
         st.error(f"Error: {e}")
-
