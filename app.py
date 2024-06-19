@@ -17,9 +17,9 @@ if "messages" not in st.session_state:
 # 기존 메시지 출력
 for msg in st.session_state.messages:
     if msg["role"] == "user":
-        st.chat_message("user", msg["content"])
+        st.markdown(f'<div style="text-align: right;">{msg["content"]}</div>', unsafe_allow_html=True)
     else:
-        st.chat_message("assistant", msg["content"])
+        st.markdown(f'<div style="text-align: left;">{msg["content"]}</div>', unsafe_allow_html=True)
 
 # 사용자 입력 처리
 prompt = st.text_input("User Input", key="user_input")
@@ -33,7 +33,7 @@ if prompt:
 
     openai.api_key = openai_api_key
     st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user", prompt)
+    st.markdown(f'<div style="text-align: right;">{prompt}</div>', unsafe_allow_html=True)
 
     try:
         # 최신 API 호출을 위한 코드
@@ -43,6 +43,6 @@ if prompt:
         )
         msg = response.choices[0].message['content']
         st.session_state.messages.append({"role": "assistant", "content": msg})
-        st.chat_message("assistant", msg)
+        st.markdown(f'<div style="text-align: left;">{msg}</div>', unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Error: {e}")
