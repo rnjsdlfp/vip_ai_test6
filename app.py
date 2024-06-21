@@ -3,13 +3,12 @@ import streamlit as st
 import uuid
 import time
 
-
 # 사이드바에서 OpenAI API 키와 Assistant ID 입력받기
 with st.sidebar:
     openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
     assistant_id = st.text_input("Assistant ID", key="assistant_id", value="asst_Dlr6YRJen7llwFxT393E5noC")
     st.markdown("[Get an OpenAI API key](https://platform.openai.com/account/api-keys)")
-    
+
     # 스레드 선택 드롭다운 및 새 스레드 생성 버튼
     if "threads" not in st.session_state:
         st.session_state["threads"] = {}
@@ -60,36 +59,17 @@ if prompt:
     st.markdown(f'<div style="text-align: right;">{prompt}</div>', unsafe_allow_html=True)
 
     try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o",
+            messages=messages
+        )
+        reply = response['choices'][0]['message']['content']
+        messages.append({"role": "assistant", "content": reply})
+        st.markdown(f'<div style="text-align: left;">{reply}</div>', unsafe_allow_html=True)
     
-        run = openai.beta.threads.runs.create(
-            thread_id=selected_thread,
-            assistant_id=assistant_id
-            )
-    
-        run_id = run.id
-    
-        while true:
-            run = openai.beta.threads.runs.retrieve(
-                thread_id=selected_thread,
-                run_id=run_id
-                )
-    
-            if run.status == "completed":
-                break
-            else:
-                time.sleep(2)
-            print(run)
-    
-        thread_messages = openai.beta.threads.messages.list(thread_id)
-    
-        msg = thread_messages.data[0].content[0].text.value
-        print(msg)
-       
-        st.session_state.messages.append({"role": "assistant", "content": msg})
-        st.chat_mnessage("assistant").write(msg)
-
     except Exception as e:
         st.error(f"Error: {e}")
-        
-        # Update the session state with the new messages
-        #st.session_state["threads"][selected_thread] = messages
+
+    # Update the session state with the new messages
+    st.session_state["threads"][selected_thread] = messages
+
