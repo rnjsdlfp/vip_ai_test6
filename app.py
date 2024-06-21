@@ -10,6 +10,10 @@ with st.sidebar:
 st.title("💬 VIP AI")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI & Jireh")
 
+# Function to create system message based on assistant ID
+def create_system_message(assistant_id):
+    return {"role": "system", "content": f"You are an assistant with ID {assistant_id}. Your role is to help the user effectively and provide accurate information."}
+
 # 초기 메시지 설정
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
