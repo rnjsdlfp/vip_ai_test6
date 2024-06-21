@@ -59,17 +59,39 @@ if prompt:
     st.markdown(f'<div style="text-align: right;">{prompt}</div>', unsafe_allow_html=True)
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=messages
+        # Assistant API를 사용하여 새로운 run 생성
+        run_response = openai.AssistantRun.create(
+            assistant_id=assistant_id,
+            thread_id=selected_thread,
+            input=prompt
         )
-        reply = response['choices'][0]['message']['content']
+        run_id = run_response['id']
+
+        # run의 상태를 주기적으로 체크
+        while True:
+            run_status = openai.AssistantRun.retrieve(
+                assistant_id=assistant_id,
+                run_id=run_id
+            )
+
+            if run_status['status'] == 'completed':
+                break
+            else:
+                time.sleep(2)
+
+        # 완료된 run에서 메시지를 가져오기
+        run_messages = openai.AssistantRun.list_messages(
+            assistant_id=assistant_id,
+            run_id=run_id
+        )
+        reply = run_messages['messages'][-1]['content']
         messages.append({"role": "assistant", "content": reply})
         st.markdown(f'<div style="text-align: left;">{reply}</div>', unsafe_allow_html=True)
-    
+
     except Exception as e:
         st.error(f"Error: {e}")
 
     # Update the session state with the new messages
     st.session_state["threads"][selected_thread] = messages
+
 
