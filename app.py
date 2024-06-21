@@ -10,8 +10,6 @@ with st.sidebar:
     assistant_id = st.text_input("Assistant ID", key="assistant_id", value="asst_Dlr6YRJen7llwFxT393E5noC")
     st.markdown("[Get an OpenAI API key](https://platform.openai.com/account/api-keys)")
     
-    client = OpenAI(api_key=openai_api_key)
-
     # 스레드 선택 드롭다운 및 새 스레드 생성 버튼
     if "threads" not in st.session_state:
         st.session_state["threads"] = {}
@@ -63,7 +61,7 @@ if prompt:
 
     try:
     
-        run = client.beta.threads.runs.create(
+        run = openai.beta.threads.runs.create(
             thread_id=selected_thread,
             assistant_id=assistant_id
             )
@@ -71,7 +69,7 @@ if prompt:
         run_id = run.id
     
         while true:
-            run = client.beta.threads.runs.retrieve(
+            run = openai.beta.threads.runs.retrieve(
                 thread_id=selected_thread,
                 run_id=run_id
                 )
@@ -82,7 +80,7 @@ if prompt:
                 time.sleep(2)
             print(run)
     
-        thread_messages = client.beta.threads.messages.list(thread_id)
+        thread_messages = openai.beta.threads.messages.list(thread_id)
     
         msg = thread_messages.data[0].content[0].text.value
         print(msg)
