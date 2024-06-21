@@ -18,6 +18,10 @@ def create_system_message(assistant_id):
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
+# Check if the assistant_id has changed and update the system message
+if assistant_id and (not st.session_state["messages"] or st.session_state["messages"][0]["content"] != create_system_message(assistant_id)["content"]):
+    st.session_state["messages"] = [create_system_message(assistant_id)]
+
 # 기존 메시지 출력
 for msg in st.session_state.messages:
     if msg["role"] == "user":
