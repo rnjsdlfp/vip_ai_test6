@@ -1,7 +1,6 @@
 import openai
 import streamlit as st
 import uuid
-import time
 
 # 사이드바에서 OpenAI API 키와 Assistant ID 입력받기
 with st.sidebar:
@@ -65,7 +64,7 @@ if prompt:
             messages=messages
         )
 
-        assistant_reply = response.choices[0].message['content']
+        assistant_reply = response['choices'][0]['message']['content']
         messages.append({"role": "assistant", "content": assistant_reply})
         st.markdown(f'<div style="text-align: left;">{assistant_reply}</div>', unsafe_allow_html=True)
 
