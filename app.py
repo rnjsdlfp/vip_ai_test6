@@ -3,8 +3,8 @@ import openai
 
 # 사이드바에서 OpenAI API 키와 Assistant ID 입력받기
 with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
-    assistant_id = st.text_input("Assistant ID", key="assistant_id")
+    openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password", value="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")
+    assistant_id = st.text_input("Assistant ID", key="assistant_id", value="asst_Dlr6YRJen7llwFxT393E5noC")
     st.markdown("[Get an OpenAI API key](https://platform.openai.com/account/api-keys)")
 
 st.title("💬 VIP AI")
