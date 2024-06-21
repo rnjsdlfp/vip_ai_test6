@@ -1,4 +1,4 @@
-import openai
+from openai import OpenAI
 import streamlit as st
 import uuid
 import time
@@ -11,9 +11,9 @@ with st.sidebar:
     
     # OpenAI 클라이언트 초기화
     if openai_api_key:
-        openai.api_key = openai_api_key
+        client = OpenAI(api_key=openai_api_key)
     else:
-        openai.api_key = None
+        client = None
     
     # 스레드 선택 드롭다운 및 새 스레드 생성 버튼
     if "threads" not in st.session_state:
@@ -23,8 +23,8 @@ with st.sidebar:
     
     if selected_thread == "새로운 스레드 생성":
         if st.button("Create New Thread"):
-            if openai.api_key:
-                new_thread = openai.beta.threads.create()
+            if client:
+                new_thread = client.beta.threads.create()
                 new_thread_id = new_thread.id
                 st.session_state["threads"][new_thread_id] = []
                 selected_thread = new_thread_id
@@ -40,8 +40,8 @@ if not selected_thread or selected_thread == "새로운 스레드 생성":
     st.info("Please select or create a thread to continue.")
     st.stop()
 
-# Check if OpenAI API key is set
-if not openai.api_key:
+# Check if OpenAI client is initialized
+if not client:
     st.info("Please add your OpenAI API key to continue.")
     st.stop()
 
@@ -65,30 +65,30 @@ if prompt:
     
     try:
         # Add the user's message to the thread
-        openai.beta.threads.messages.create(
+        client.beta.threads.messages.create(
             thread_id=selected_thread,
             role="user",
             content=prompt
         )
         
         # Run the assistant
-        run = openai.beta.threads.runs.create(
+        run = client.beta.threads.runs.create(
             thread_id=selected_thread,
             assistant_id=assistant_id
         )
         
         # Wait for the run to complete
         while True:
-            run_status = openai.beta.threads.runs.retrieve(thread_id=selected_thread, run_id=run.id)
+            run_status = client.beta.threads.runs.retrieve(thread_id=selected_thread, run_id=run.id)
             if run_status.status == 'completed':
                 break
             time.sleep(1)
         
         # Retrieve the latest messages
-        thread_messages = openai.beta.threads.messages.list(thread_id=selected_thread)
+        thread_messages = client.beta.threads.messages.list(thread_id=selected_thread)
         
         # Get the latest assistant message
-        assistant_messages = [msg for msg in thread_messages.data if msg.role == "assistant"]
+        assistant_messages = [msg for msg in thread_messages if msg.role == "assistant"]
         if assistant_messages:
             latest_message = assistant_messages[0].content[0].text.value
             messages.append({"role": "assistant", "content": latest_message})
