@@ -1,5 +1,5 @@
-import streamlit as st
 from openai import OpenAI 
+import streamlit as st
 import uuid
 import time
 
