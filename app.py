@@ -45,7 +45,7 @@ if prompt:
         
         # 최신 API 호출을 위한 코드
         response = openai.ChatCompletion.create(
-            model="gpt-4-turbo",  # 사용 가능한 모델로 변경
+            model="gpt-4o",  # 사용 가능한 모델로 변경
             messages=messages
             #messages=st.session_state["messages"]
         )
