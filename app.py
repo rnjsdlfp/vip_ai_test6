@@ -1,6 +1,7 @@
 import streamlit as st
 import openai
 import uuid
+import time
 
 # 사이드바에서 OpenAI API 키와 Assistant ID 입력받기
 with st.sidebar:
@@ -58,19 +59,36 @@ if prompt:
     st.markdown(f'<div style="text-align: right;">{prompt}</div>', unsafe_allow_html=True)
 
     try:
-        # Add the assistant's ID message at the beginning of each call
-        current_messages = [create_system_message(assistant_id)] + messages[1:]
-        
-        # 최신 API 호출을 위한 코드
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",  # 사용 가능한 모델로 변경
-            messages=current_messages
-        )
-        msg = response.choices[0].message['content']
-        messages.append({"role": "assistant", "content": msg})
-        st.markdown(f'<div style="text-align: left;">{msg}</div>', unsafe_allow_html=True)
+    
+        run = client.beta.threads.runs.create(
+            thread_id=selected_thread,
+            assistant_id=assistant_id
+            )
+    
+        run_id = run.id
+    
+        while true:
+            run = client.beta.threads.runs.retrieve(
+                thread_id=selected_thread,
+                run_id=run_id
+                )
+    
+            if run.status == "completed":
+                break
+            else:
+                time.sleep(2)
+            print(run)
+    
+        thread_messages = client.beta.threads.messages.list(thread_id)
+    
+        msg = thread_messages.data[0].content[0].text.value
+        print(msg)
+       
+        st.session_state.messages.append({"role": "assistant", "content": msg})
+        st.chat_mnessage("assistant").write(msg)
+
     except Exception as e:
         st.error(f"Error: {e}")
-
-    # Update the session state with the new messages
-    st.session_state["threads"][selected_thread] = messages
+        
+        # Update the session state with the new messages
+        #st.session_state["threads"][selected_thread] = messages
