@@ -36,10 +36,14 @@ if prompt:
     st.markdown(f'<div style="text-align: right;">{prompt}</div>', unsafe_allow_html=True)
 
     try:
+        # Add the assistant's ID message at the beginning of each call
+        messages = [create_system_message(assistant_id)] + st.session_state.messages[1:]
+        
         # 최신 API 호출을 위한 코드
         response = openai.ChatCompletion.create(
             model="gpt-4o",  # 사용 가능한 모델로 변경
-            messages=st.session_state["messages"]
+            messages=messages
+            #messages=st.session_state["messages"]
         )
         msg = response.choices[0].message['content']
         st.session_state.messages.append({"role": "assistant", "content": msg})
