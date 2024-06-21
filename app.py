@@ -44,13 +44,11 @@ if prompt := st.chat_input():
         role="user",
         content=prompt,
         )
-    print(response)
     
     run = client.beta.threads.runs.create(
         thread_id = thread_id,
         assistant_id = assistant_id
         )
-    print(run)
 
     run_id = run.id
 
@@ -63,7 +61,6 @@ if prompt := st.chat_input():
             break
         else:
             time.sleep(2)
-        print(run)
 
     thread_messages = client.beta.threads.messages.list(thread_id)
     msg = thread_messages.data[0].content[0].text.value
