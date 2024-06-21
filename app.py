@@ -1,9 +1,9 @@
 import streamlit as st
-from openai import OpenAI
+import openai 
 import uuid
 import time
 
-client = OpenAI()
+client = openai()
 
 # 사이드바에서 OpenAI API 키와 Assistant ID 입력받기
 with st.sidebar:
