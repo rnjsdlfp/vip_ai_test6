@@ -1,4 +1,4 @@
-import openai
+from openai import OpenAI
 import streamlit as st
 import uuid
 import time
@@ -9,6 +9,12 @@ with st.sidebar:
     assistant_id = st.text_input("Assistant ID", key="assistant_id", value="asst_Dlr6YRJen7llwFxT393E5noC")
     st.markdown("[Get an OpenAI API key](https://platform.openai.com/account/api-keys)")
     
+    # OpenAI 클라이언트 초기화
+    if openai_api_key:
+        client = OpenAI(api_key=openai_api_key)
+    else:
+        client = None
+    
     # 스레드 선택 드롭다운 및 새 스레드 생성 버튼
     if "threads" not in st.session_state:
         st.session_state["threads"] = {}
@@ -17,12 +23,14 @@ with st.sidebar:
     
     if selected_thread == "새로운 스레드 생성":
         if st.button("Create New Thread"):
-            client = openai.OpenAI(api_key=openai_api_key)
-            new_thread = client.beta.threads.create()
-            new_thread_id = new_thread.id
-            st.session_state["threads"][new_thread_id] = []
-            selected_thread = new_thread_id
-            st.success(f"New thread created with ID: {new_thread_id}")
+            if client:
+                new_thread = client.beta.threads.create()
+                new_thread_id = new_thread.id
+                st.session_state["threads"][new_thread_id] = []
+                selected_thread = new_thread_id
+                st.success(f"New thread created with ID: {new_thread_id}")
+            else:
+                st.error("OpenAI API key is required to create a new thread.")
 
 st.title("💬 VIP AI")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI & Jireh")
@@ -32,12 +40,10 @@ if not selected_thread or selected_thread == "새로운 스레드 생성":
     st.info("Please select or create a thread to continue.")
     st.stop()
 
-# Initialize OpenAI client
-if not openai_api_key:
+# Check if OpenAI client is initialized
+if not client:
     st.info("Please add your OpenAI API key to continue.")
     st.stop()
-
-client = openai.OpenAI(api_key=openai_api_key)
 
 # Display existing messages for the current thread
 messages = st.session_state["threads"].get(selected_thread, [])
