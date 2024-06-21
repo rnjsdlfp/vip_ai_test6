@@ -1,4 +1,4 @@
-import openai 
+from openai import OpenAI
 import streamlit as st
 import uuid
 import time
@@ -10,7 +10,7 @@ with st.sidebar:
     assistant_id = st.text_input("Assistant ID", key="assistant_id", value="asst_Dlr6YRJen7llwFxT393E5noC")
     st.markdown("[Get an OpenAI API key](https://platform.openai.com/account/api-keys)")
     
-    client = openai(api_key=openai_api_key)
+    client = OpenAI(api_key=openai_api_key)
 
     # 스레드 선택 드롭다운 및 새 스레드 생성 버튼
     if "threads" not in st.session_state:
