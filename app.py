@@ -18,6 +18,7 @@ with st.sidebar:
             new_thread_id = str(uuid.uuid4())
             st.session_state["threads"][new_thread_id] = []
             selected_thread = new_thread_id
+            st.success(f"New thread created with ID: {new_thread_id}")
 
 st.title("💬 VIP AI")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI & Jireh")
@@ -62,7 +63,7 @@ if prompt:
         
         # 최신 API 호출을 위한 코드
         response = openai.ChatCompletion.create(
-            model="gpt-4",  # 사용 가능한 모델로 변경
+            model="gpt-4o",  # 사용 가능한 모델로 변경
             messages=current_messages
         )
         msg = response.choices[0].message['content']
