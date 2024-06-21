@@ -1,4 +1,4 @@
-from openai import OpenAI
+import openai
 import streamlit as st
 import uuid
 import time
@@ -11,7 +11,7 @@ with st.sidebar:
     
     # OpenAI 클라이언트 초기화
     if openai_api_key:
-        client = OpenAI(api_key=openai_api_key)
+        client = openai.Client(api_key=openai_api_key)
     else:
         client = None
     
@@ -78,9 +78,11 @@ if prompt:
         )
         
         # Wait for the run to complete
-        while run.status != "completed":
+        while True:
+            run_status = client.beta.threads.runs.retrieve(thread_id=selected_thread, run_id=run.id)
+            if run_status.status == 'completed':
+                break
             time.sleep(1)
-            run = client.beta.threads.runs.retrieve(thread_id=selected_thread, run_id=run.id)
         
         # Retrieve the latest messages
         thread_messages = client.beta.threads.messages.list(thread_id=selected_thread)
@@ -97,4 +99,3 @@ if prompt:
     
     # Update the session state with the new messages
     st.session_state["threads"][selected_thread] = messages
-
